@@ -60,7 +60,7 @@ module.exports = {
       },
       {
         test: /\.(jpe?g|png|webp|gif|svg)$/i,
-        use: [
+        /* use: [
           {
             loader: "image-webpack-loader",
             options: {
@@ -82,7 +82,7 @@ module.exports = {
               },
             },
           },
-        ],
+        ], */
         type: "asset/resource",
         generator: {
           filename: "assets/images/[name][ext]",

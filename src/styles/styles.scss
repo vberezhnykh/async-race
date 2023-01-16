@@ -1,5 +1,39 @@
 @import 'normalize';
 
-h1 {
-  color: red
+body {
+  padding: 10px;
+}
+
+.car-list {
+  padding: 0;
+}
+
+.car-list__item {
+  border-bottom: 2px dotted black;
+  margin-bottom: 15px;
+}
+
+.control-buttons {
+  display: inline-flex;
+  gap: 10px;
+}
+
+.car-list__car-name {
+  margin-left: 10px;
+}
+
+.drive-buttons {
+  display: flex;
+  gap: 10px;
+  padding: 15px 0;
+}
+
+.track {
+  display: flex;
+  justify-content: space-between;
+  margin-right: 64px;
+}
+
+.flag {
+  width: 64px;
 }
