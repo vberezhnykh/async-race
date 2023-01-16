@@ -20,17 +20,15 @@ import { defaultCarImage } from "./carImage";
 const API_URL = "http://127.0.0.1:3000";
 
 export class Garage {
-  _totalNumberOfCars?: string;
-  _carsInGarage?: Array<Сharacteristics>;
-  _selectedCarId?: number;
-  _updateButton?: HTMLButtonElement;
-  _listOfCars?: HTMLUListElement;
-  _listItems?: Array<ChildNode>;
-  _paginationLimit = 7;
-  _pageCount = 1;
-  _currentPage = 1;
-  _prevRange = 0;
-  _currRange = 7;
+  private _totalNumberOfCars?: string;
+  private _carsInGarage?: Array<Сharacteristics>;
+  private _selectedCarId?: number;
+  private _updateButton?: HTMLButtonElement;
+  private _paginationLimit = 7;
+  private _pageCount = 1;
+  private _currentPage = 1;
+  private _prevRange = 0;
+  private _currRange = 7;
 
   private getCarsAndSetProps() {
     return getCars(API_URL).then((data) => {
@@ -139,6 +137,7 @@ export class Garage {
     if (this._currentPage === 1) prevButton.disabled = true;
     nav.append(prevButton);
     const paginationNumber = document.createElement("span");
+    paginationNumber.classList.add("page-number");
     paginationNumber.textContent = `Page #${this._currentPage}`;
     nav.append(paginationNumber);
     const nextButton = document.createElement("button");
@@ -197,70 +196,84 @@ export class Garage {
       const car = new Car(carInGarage);
       const container = document.createElement("li");
       container.classList.add("car-list__item");
-      // кнопки управления select remove
-      const controlButtonsContainer = document.createElement("div");
-      controlButtonsContainer.classList.add("control-buttons");
-      const selectButton = document.createElement("button");
-      selectButton.textContent = "SELECT";
-      selectButton.addEventListener("click", () => {
-        this._selectedCarId = index + 1;
-        if (this._updateButton) this._updateButton.disabled = false;
-      });
-      controlButtonsContainer.append(selectButton);
-      const removeButton = document.createElement("button");
-      removeButton.textContent = "REMOVE";
-      removeButton.addEventListener("click", () => {
-        this.deleteCarAndUpdateView(index);
-      });
-      controlButtonsContainer.append(removeButton);
-      container.append(controlButtonsContainer);
-      // название машины
-      const carName = document.createElement("span");
-      carName.classList.add("car-list__car-name");
-      carName.textContent = car.name;
-      container.append(carName);
-      // кнопки управления автомобилем
-      const driveButtonsContainer = document.createElement("div");
-      driveButtonsContainer.classList.add("drive-buttons");
-      const accelerateButton = document.createElement("button");
-      accelerateButton.textContent = "A";
-      driveButtonsContainer.append(accelerateButton);
-      const breakButton = document.createElement("button");
-      breakButton.textContent = "B";
-      breakButton.disabled = true;
-      driveButtonsContainer.append(breakButton);
-      container.append(driveButtonsContainer);
-      // трек
-      const track = document.createElement("div");
-      track.classList.add("track");
-      // изображение машины;
-      const image = document.createElement("div");
-      const svgImage = defaultCarImage.replace(
-        `fill="#000000"`,
-        `fill=${carInGarage.color}`
-      );
-      image.innerHTML = svgImage;
-      track.append(image);
-      // изображение флага
-      const flag = new Image();
-      flag.classList.add("flag");
-      flag.src = finishFlagSrc;
-      track.append(flag);
-      container.append(track);
+      this.createSelectAndRemoveButtons(index, container, car);
+      this.createCarName(car, container);
+      this.createCarControls(container);
+      this.createTrack(carInGarage, container);
       if (index >= this._prevRange && index < this._currRange) {
         listOfCars.appendChild(container);
       }
     });
-    this._listOfCars = listOfCars;
-    this._listItems = Array.from(listOfCars.childNodes);
     return listOfCars;
   }
 
-  private deleteCarAndUpdateView(index: number) {
+  private createTrack(carInGarage: Сharacteristics, container: HTMLLIElement) {
+    const track = document.createElement("div");
+    track.classList.add("track");
+    // изображение машины;
+    const image = document.createElement("div");
+    const svgImage = defaultCarImage.replace(
+      `fill="#000000"`,
+      `fill=${carInGarage.color}`
+    );
+    image.innerHTML = svgImage;
+    track.append(image);
+    // изображение флага
+    const flag = new Image();
+    flag.classList.add("flag");
+    flag.src = finishFlagSrc;
+    track.append(flag);
+    container.append(track);
+  }
+
+  private createCarControls(container: HTMLLIElement) {
+    const driveButtonsContainer = document.createElement("div");
+    driveButtonsContainer.classList.add("drive-buttons");
+    const accelerateButton = document.createElement("button");
+    accelerateButton.textContent = "A";
+    driveButtonsContainer.append(accelerateButton);
+    const breakButton = document.createElement("button");
+    breakButton.textContent = "B";
+    breakButton.disabled = true;
+    driveButtonsContainer.append(breakButton);
+    container.append(driveButtonsContainer);
+  }
+
+  private createCarName(car: Car, container: HTMLLIElement) {
+    const carName = document.createElement("span");
+    carName.classList.add("car-list__car-name");
+    carName.textContent = car.name;
+    container.append(carName);
+  }
+
+  private createSelectAndRemoveButtons(
+    index: number,
+    container: HTMLLIElement,
+    car: Car
+  ) {
+    const controlButtonsContainer = document.createElement("div");
+    controlButtonsContainer.classList.add("control-buttons");
+    const selectButton = document.createElement("button");
+    selectButton.textContent = "SELECT";
+    selectButton.addEventListener("click", () => {
+      this._selectedCarId = car.id;
+      if (this._updateButton) this._updateButton.disabled = false;
+    });
+    controlButtonsContainer.append(selectButton);
+    const removeButton = document.createElement("button");
+    removeButton.textContent = "REMOVE";
+    removeButton.addEventListener("click", () => {
+      this.deleteCarAndUpdateView(car.id, index);
+    });
+    controlButtonsContainer.append(removeButton);
+    container.append(controlButtonsContainer);
+  }
+
+  private deleteCarAndUpdateView(id: number, index: number) {
     if (index === this._prevRange) {
       this._currentPage--;
       this.updatePageRanges();
     }
-    deleteCar(API_URL, index + 1).then(() => this.updateView());
+    deleteCar(API_URL, id).then(() => this.updateView());
   }
 }
