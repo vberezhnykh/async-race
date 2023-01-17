@@ -26,30 +26,40 @@ const CAR_MODELS = [
   "AMG GT",
 ];
 
-export class Car {
-  private _name: string;
-  private _color: string;
-  private _id: number;
-  private _models = CAR_MODELS;
-  private _brands = CAR_BRANDS;
-  constructor(characteristics: Сharacteristics) {
-    this._name = characteristics.name;
-    this._color = characteristics.color;
-    this._id = characteristics.id;
+class Car {
+  name: string;
+
+  color: string;
+
+  id?: number;
+
+  constructor(isRandom: boolean, characteristics?: Сharacteristics) {
+    if (!isRandom && characteristics) {
+      this.name = characteristics.name;
+      this.color = characteristics.color;
+      this.id = characteristics.id;
+    } else {
+      const brand = CAR_BRANDS[Car.getRandomIntInclusive(0, 9)];
+      const model = CAR_MODELS[Car.getRandomIntInclusive(0, 9)];
+      this.name = `${brand} ${model}`;
+      this.color = `${Car.getRandomColor()}`;
+    }
   }
-  get name() {
-    return this._name;
+
+  static getRandomIntInclusive(min: number, max: number) {
+    const minNum = Math.ceil(min);
+    const maxNum = Math.floor(max);
+    return Math.floor(Math.random() * (maxNum - minNum + 1) + minNum);
   }
-  get color() {
-    return this._color;
-  }
-  get id() {
-    return this._id;
-  }
-  get models() {
-    return this._models;
-  }
-  get brands() {
-    return this._brands;
+
+  static getRandomColor() {
+    const LETTERS = "0123456789ABCDEF";
+    let color = "#";
+    for (let i = 0; i < 6; i += 1) {
+      color += LETTERS[Math.floor(Math.random() * 16)];
+    }
+    return color;
   }
 }
+
+export default Car;

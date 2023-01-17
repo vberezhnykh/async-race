@@ -8,7 +8,7 @@ module.exports = {
     "plugin:@typescript-eslint/recommended",
     "airbnb-base",
     "airbnb-typescript/base",
-    "prettier@typescript-eslint",
+    "prettier",
   ],
   overrides: [],
   parser: "@typescript-eslint/parser",
@@ -18,5 +18,7 @@ module.exports = {
     project: "./tsconfig.json",
   },
   plugins: ["@typescript-eslint"],
-  rules: {},
+  rules: {
+    "no-param-reassign": [2, { props: false }],
+  },
 };

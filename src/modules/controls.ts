@@ -1,13 +1,16 @@
-import { Garage } from "./garage";
+import Garage from "./garage";
 import { Winners } from "./winners";
 
-export class Controls {
-  _Garage: Garage;
-  _Winners: Winners;
+class Controls {
+  Garage: Garage;
+
+  Winners: Winners;
+
   constructor(garage: Garage, winners: Winners) {
-    this._Garage = garage;
-    this._Winners = winners;
+    this.Garage = garage;
+    this.Winners = winners;
   }
+
   render() {
     const garageButton = document.createElement("button");
     garageButton.textContent = "TO GARAGE";
@@ -27,9 +30,11 @@ export class Controls {
     if (main) {
       main.innerHTML = "";
       if (button instanceof HTMLButtonElement) {
-        if (button.textContent === "TO GARAGE") this._Garage.render();
+        if (button.textContent === "TO GARAGE") this.Garage.render();
         /* if (button.textContent === 'TO WINNERS')  */
       }
     }
   }
 }
+
+export default Controls;

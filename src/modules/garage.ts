@@ -1,44 +1,47 @@
 import {
   Сharacteristics,
   createCar,
-  createWinner,
   deleteCar,
-  deleteWinner,
-  getCar,
   getCars,
-  getWinner,
-  getWinners,
-  toggleCarEngine,
-  /* toggleDriveMode, */
   updateCar,
-  updateWinner,
 } from "./api";
-import { Car } from "./car";
+import Car from "./car";
 import finishFlagSrc from "../assets/finish-flag.svg";
 import { defaultCarImage } from "./carImage";
 
 const API_URL = "http://127.0.0.1:3000";
 
-export class Garage {
-  private _totalNumberOfCars?: string;
-  private _carsInGarage?: Array<Сharacteristics>;
-  private _selectedCarId?: number;
-  private _updateButton?: HTMLButtonElement;
-  private _paginationLimit = 7;
-  private _pageCount = 1;
-  private _currentPage = 1;
-  private _prevRange = 0;
-  private _currRange = 7;
+class Garage {
+  private totalNumberOfCars?: string;
+
+  private carsInGarage?: Array<Сharacteristics>;
+
+  private selectedCarId?: number;
+
+  private updateButton?: HTMLButtonElement;
+
+  private paginationLimit = 7;
+
+  private pageCount = 1;
+
+  private currentPage = 1;
+
+  private prevRange = 0;
+
+  private currRange = 7;
 
   private getCarsAndSetProps() {
     return getCars(API_URL).then((data) => {
       if (data instanceof Object) {
-        data.totalNumberOfCars !== null
-          ? (this._totalNumberOfCars = data.totalNumberOfCars)
-          : (this._totalNumberOfCars = data.cars.length);
-        this._carsInGarage = data.cars;
-        this._pageCount = Math.ceil(
-          Number(this._totalNumberOfCars) / this._paginationLimit
+        if (data.totalNumberOfCars !== null)
+          this.totalNumberOfCars = data.totalNumberOfCars;
+        else this.totalNumberOfCars = data.cars.length;
+        /* data.totalNumberOfCars !== null
+          ? (this.totalNumberOfCars = data.totalNumberOfCars)
+          : (this.totalNumberOfCars = data.cars.length); */
+        this.carsInGarage = data.cars;
+        this.pageCount = Math.ceil(
+          Number(this.totalNumberOfCars) / this.paginationLimit
         );
       }
     });
@@ -50,6 +53,7 @@ export class Garage {
       if (main) {
         main.appendChild(this.createCreateInput());
         main.appendChild(this.createUpdateInput());
+        main.appendChild(this.createGenerateButton());
         main.appendChild(this.createHeading());
         main.appendChild(this.createPagination());
         main.appendChild(this.createListOfCars());
@@ -106,7 +110,7 @@ export class Garage {
     button.addEventListener("click", () =>
       this.updateCarAndView(input, colorInput)
     );
-    this._updateButton = button;
+    this.updateButton = button;
     container.append(button);
     return container;
   }
@@ -115,17 +119,33 @@ export class Garage {
     input: HTMLInputElement,
     colorInput: HTMLInputElement
   ) {
-    if (this._selectedCarId) {
-      updateCar(API_URL, this._selectedCarId, {
+    if (this.selectedCarId) {
+      updateCar(API_URL, this.selectedCarId, {
         name: input.value,
         color: colorInput.value,
       }).then(() => this.updateView());
     }
   }
 
+  private createGenerateButton() {
+    const button = document.createElement("button");
+    button.innerHTML = "GENERATE CARS";
+    button.onclick = () => {
+      for (let i = 0; i < 100; i += 1) {
+        const car = new Car(true);
+        createCar(API_URL, {
+          name: car.name,
+          color: car.color,
+        });
+      }
+      this.updateView();
+    };
+    return button;
+  }
+
   private createHeading() {
     const header = document.createElement("h2");
-    header.textContent = `Garage (${this._totalNumberOfCars})`;
+    header.textContent = `Garage (${this.totalNumberOfCars})`;
     return header;
   }
 
@@ -134,25 +154,25 @@ export class Garage {
     nav.classList.add("pagination-nav");
     const prevButton = document.createElement("button");
     prevButton.textContent = "←";
-    if (this._currentPage === 1) prevButton.disabled = true;
+    if (this.currentPage === 1) prevButton.disabled = true;
     nav.append(prevButton);
     const paginationNumber = document.createElement("span");
     paginationNumber.classList.add("page-number");
-    paginationNumber.textContent = `Page #${this._currentPage}`;
+    paginationNumber.textContent = `Page #${this.currentPage}`;
     nav.append(paginationNumber);
     const nextButton = document.createElement("button");
     nextButton.textContent = "→";
-    if (this._currentPage === this._pageCount) nextButton.disabled = true;
+    if (this.currentPage === this.pageCount) nextButton.disabled = true;
     nav.append(nextButton);
     prevButton.onclick = () => {
-      if (this._currentPage > 1) {
-        this._currentPage--;
+      if (this.currentPage > 1) {
+        this.currentPage -= 1;
         this.updateCarListView(prevButton, nextButton, nav, paginationNumber);
       }
     };
     nextButton.onclick = () => {
-      if (this._currentPage < this._pageCount) {
-        this._currentPage++;
+      if (this.currentPage < this.pageCount) {
+        this.currentPage += 1;
         this.updateCarListView(prevButton, nextButton, nav, paginationNumber);
       }
     };
@@ -160,19 +180,19 @@ export class Garage {
   }
 
   private updatePageRanges() {
-    this._prevRange = (this._currentPage - 1) * this._paginationLimit;
-    this._currRange = this._currentPage * this._paginationLimit;
+    this.prevRange = (this.currentPage - 1) * this.paginationLimit;
+    this.currRange = this.currentPage * this.paginationLimit;
   }
 
   private handlePrevButton(prevButton: HTMLButtonElement) {
     this.updatePageRanges();
-    if (this._currentPage === 1) prevButton.disabled = true;
+    if (this.currentPage === 1) prevButton.disabled = true;
     else prevButton.disabled = false;
   }
 
   private handleNextButton(nextButton: HTMLButtonElement) {
     this.updatePageRanges();
-    if (this._pageCount === this._currentPage) nextButton.disabled = true;
+    if (this.pageCount === this.currentPage) nextButton.disabled = true;
     else nextButton.disabled = false;
   }
 
@@ -186,28 +206,28 @@ export class Garage {
     this.handleNextButton(nextButton);
     document.querySelector(".car-list")?.remove();
     nav.after(this.createListOfCars());
-    paginationNumber.textContent = `Page #${this._currentPage}`;
+    paginationNumber.textContent = `Page #${this.currentPage}`;
   }
 
   private createListOfCars() {
     const listOfCars = document.createElement("ul");
     listOfCars.classList.add("car-list");
-    this._carsInGarage?.forEach((carInGarage, index) => {
-      const car = new Car(carInGarage);
+    this.carsInGarage?.forEach((carInGarage, index) => {
+      const car = new Car(false, carInGarage);
       const container = document.createElement("li");
       container.classList.add("car-list__item");
       this.createSelectAndRemoveButtons(index, container, car);
-      this.createCarName(car, container);
-      this.createCarControls(container);
-      this.createTrack(carInGarage, container);
-      if (index >= this._prevRange && index < this._currRange) {
+      Garage.createCarName(car, container);
+      Garage.createCarControls(container);
+      Garage.createTrack(carInGarage, container);
+      if (index >= this.prevRange && index < this.currRange) {
         listOfCars.appendChild(container);
       }
     });
     return listOfCars;
   }
 
-  private createTrack(carInGarage: Сharacteristics, container: HTMLLIElement) {
+  static createTrack(carInGarage: Сharacteristics, container: HTMLLIElement) {
     const track = document.createElement("div");
     track.classList.add("track");
     // изображение машины;
@@ -226,7 +246,7 @@ export class Garage {
     container.append(track);
   }
 
-  private createCarControls(container: HTMLLIElement) {
+  static createCarControls(container: HTMLLIElement) {
     const driveButtonsContainer = document.createElement("div");
     driveButtonsContainer.classList.add("drive-buttons");
     const accelerateButton = document.createElement("button");
@@ -239,7 +259,7 @@ export class Garage {
     container.append(driveButtonsContainer);
   }
 
-  private createCarName(car: Car, container: HTMLLIElement) {
+  static createCarName(car: Car, container: HTMLLIElement) {
     const carName = document.createElement("span");
     carName.classList.add("car-list__car-name");
     carName.textContent = car.name;
@@ -256,24 +276,26 @@ export class Garage {
     const selectButton = document.createElement("button");
     selectButton.textContent = "SELECT";
     selectButton.addEventListener("click", () => {
-      this._selectedCarId = car.id;
-      if (this._updateButton) this._updateButton.disabled = false;
+      this.selectedCarId = car.id;
+      if (this.updateButton) this.updateButton.disabled = false;
     });
     controlButtonsContainer.append(selectButton);
     const removeButton = document.createElement("button");
     removeButton.textContent = "REMOVE";
     removeButton.addEventListener("click", () => {
-      this.deleteCarAndUpdateView(car.id, index);
+      if (car.id) this.deleteCarAndUpdateView(car.id, index);
     });
     controlButtonsContainer.append(removeButton);
     container.append(controlButtonsContainer);
   }
 
   private deleteCarAndUpdateView(id: number, index: number) {
-    if (index === this._prevRange) {
-      this._currentPage--;
+    if (index === this.prevRange) {
+      this.currentPage -= 1;
       this.updatePageRanges();
     }
     deleteCar(API_URL, id).then(() => this.updateView());
   }
 }
+
+export default Garage;

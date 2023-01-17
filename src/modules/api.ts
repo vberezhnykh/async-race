@@ -23,11 +23,14 @@ export async function getCar(url: string, id: number) {
   return response.status;
 }
 
-interface CarParams {
+export interface CarParams {
   name: string;
   color: string;
 }
-export async function createCar(url: string, params: CarParams) {
+export async function createCar(
+  url: string,
+  params: CarParams | Array<CarParams>
+) {
   const response = await fetch(`${url}/garage`, {
     method: "POST",
     headers: {
@@ -68,10 +71,10 @@ export async function toggleCarEngine(
   return response.status;
 }
 
-type SpeedAndDistance = {
+/* type SpeedAndDistance = {
   velocity: number;
   distance: number;
-};
+}; */
 /* export async function toggleDriveMode(url: string, id: number) {
   const response = await fetch(`${url}/engine?id=${id}&status='drive`);
   if (response.ok) return response.json();
