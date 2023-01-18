@@ -71,15 +71,16 @@ export async function toggleCarEngine(
   return response.status;
 }
 
-/* type SpeedAndDistance = {
+export type SpeedAndDistance = {
   velocity: number;
   distance: number;
-}; */
-/* export async function toggleDriveMode(url: string, id: number) {
-  const response = await fetch(`${url}/engine?id=${id}&status='drive`);
-  if (response.ok) return response.json();
-  return response.status;
-} */
+};
+export async function toggleDriveMode(url: string, id: number) {
+  const response = await fetch(`${url}/engine?id=${id}&status=drive`, {
+    method: "PATCH",
+  });
+  return response;
+}
 
 interface WinnersParams {
   _page?: number;

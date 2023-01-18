@@ -36,9 +36,6 @@ class Garage {
         if (data.totalNumberOfCars !== null)
           this.totalNumberOfCars = data.totalNumberOfCars;
         else this.totalNumberOfCars = data.cars.length;
-        /* data.totalNumberOfCars !== null
-          ? (this.totalNumberOfCars = data.totalNumberOfCars)
-          : (this.totalNumberOfCars = data.cars.length); */
         this.carsInGarage = data.cars;
         this.pageCount = Math.ceil(
           Number(this.totalNumberOfCars) / this.paginationLimit
@@ -218,8 +215,8 @@ class Garage {
       container.classList.add("car-list__item");
       this.createSelectAndRemoveButtons(index, container, car);
       Garage.createCarName(car, container);
-      Garage.createCarControls(container);
-      Garage.createTrack(carInGarage, container);
+      Garage.createCarControls(container, car);
+      Garage.createTrack(carInGarage, container, car);
       if (index >= this.prevRange && index < this.currRange) {
         listOfCars.appendChild(container);
       }
@@ -227,17 +224,23 @@ class Garage {
     return listOfCars;
   }
 
-  static createTrack(carInGarage: Сharacteristics, container: HTMLLIElement) {
+  static createTrack(
+    carInGarage: Сharacteristics,
+    container: HTMLLIElement,
+    car: Car
+  ) {
     const track = document.createElement("div");
     track.classList.add("track");
     // изображение машины;
     const image = document.createElement("div");
+    image.classList.add("car-image");
     const svgImage = defaultCarImage.replace(
       `fill="#000000"`,
       `fill=${carInGarage.color}`
     );
     image.innerHTML = svgImage;
     track.append(image);
+    car.element = image;
     // изображение флага
     const flag = new Image();
     flag.classList.add("flag");
@@ -246,11 +249,14 @@ class Garage {
     container.append(track);
   }
 
-  static createCarControls(container: HTMLLIElement) {
+  static createCarControls(container: HTMLLIElement, car: Car) {
     const driveButtonsContainer = document.createElement("div");
     driveButtonsContainer.classList.add("drive-buttons");
     const accelerateButton = document.createElement("button");
     accelerateButton.textContent = "A";
+    accelerateButton.onclick = () => {
+      car.animateCar(API_URL, container);
+    };
     driveButtonsContainer.append(accelerateButton);
     const breakButton = document.createElement("button");
     breakButton.textContent = "B";
@@ -283,18 +289,25 @@ class Garage {
     const removeButton = document.createElement("button");
     removeButton.textContent = "REMOVE";
     removeButton.addEventListener("click", () => {
-      if (car.id) this.deleteCarAndUpdateView(car.id, index);
+      if (car.id) this.deleteCarAndUpdateView(car.id, index /* container */);
     });
     controlButtonsContainer.append(removeButton);
     container.append(controlButtonsContainer);
   }
 
-  private deleteCarAndUpdateView(id: number, index: number) {
+  private deleteCarAndUpdateView(
+    id: number,
+    index: number
+    /* container: HTMLLIElement */
+  ) {
     if (index === this.prevRange) {
       this.currentPage -= 1;
       this.updatePageRanges();
     }
-    deleteCar(API_URL, id).then(() => this.updateView());
+    deleteCar(API_URL, id).then(() =>
+      // container.remove()
+      this.updateView()
+    );
   }
 }
 
