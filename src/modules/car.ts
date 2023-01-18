@@ -82,7 +82,12 @@ class Car {
     return color;
   }
 
-  animateCar(url: string, container: HTMLLIElement) {
+  animateCar(
+    url: string,
+    container: HTMLLIElement,
+    accelerateButton: HTMLButtonElement,
+    breakButton: HTMLButtonElement
+  ) {
     if (this.id) {
       toggleCarEngine(url, this.id, "started")
         .then((data) => {
@@ -92,7 +97,7 @@ class Car {
         .then(() => {
           if (this.id)
             toggleDriveMode(url, this.id).then((data) => {
-              this.moveCar(data);
+              this.moveCar(data, accelerateButton, breakButton);
             });
         });
     }
@@ -112,20 +117,44 @@ class Car {
     }
   }
 
-  moveCar(response: Response) {
+  moveCar(
+    response: Response,
+    accelerateButton: HTMLButtonElement,
+    breakButton: HTMLButtonElement
+  ) {
     clearInterval(this.intervalId);
     let deltaPx = 0;
+    breakButton.disabled = false;
+    accelerateButton.disabled = true;
     this.intervalId = setInterval(() => {
-      if (
-        response.status === 500 ||
-        (this.distance && deltaPx >= this.distance)
-      ) {
+      if (response.status === 500) {
         clearInterval(this.intervalId);
+      } else if (this.distance && deltaPx >= this.distance) {
+        clearInterval(this.intervalId);
+        breakButton.disabled = true;
+        accelerateButton.disabled = false;
       } else if (this.element && this.velocity) {
         deltaPx += (this.velocity / 1000) * 16;
         this.element.style.left = `${deltaPx}px`;
       }
     }, 16);
+  }
+
+  stopCarAnimation(
+    url: string,
+    accelerateButton: HTMLButtonElement,
+    breakButton: HTMLButtonElement
+  ) {
+    if (this.id) {
+      toggleCarEngine(url, this.id, "stopped").then((data) => {
+        if (data === 200 && this.element) {
+          clearInterval(this.intervalId);
+          this.element.style.left = "0";
+          accelerateButton.disabled = false;
+          breakButton.disabled = true;
+        }
+      });
+    }
   }
 }
 

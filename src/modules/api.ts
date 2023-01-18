@@ -67,7 +67,7 @@ export async function toggleCarEngine(
   const response = await fetch(`${url}/engine?id=${id}&status=${status}`, {
     method: "PATCH",
   });
-  if (response.ok) return response.json();
+  if (response.ok && status === "started") return response.json();
   return response.status;
 }
 

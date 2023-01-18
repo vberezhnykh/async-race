@@ -254,15 +254,18 @@ class Garage {
     driveButtonsContainer.classList.add("drive-buttons");
     const accelerateButton = document.createElement("button");
     accelerateButton.textContent = "A";
-    accelerateButton.onclick = () => {
-      car.animateCar(API_URL, container);
-    };
     driveButtonsContainer.append(accelerateButton);
     const breakButton = document.createElement("button");
     breakButton.textContent = "B";
     breakButton.disabled = true;
     driveButtonsContainer.append(breakButton);
     container.append(driveButtonsContainer);
+    accelerateButton.onclick = () => {
+      car.animateCar(API_URL, container, accelerateButton, breakButton);
+    };
+    breakButton.onclick = () => {
+      car.stopCarAnimation(API_URL, accelerateButton, breakButton);
+    };
   }
 
   static createCarName(car: Car, container: HTMLLIElement) {
