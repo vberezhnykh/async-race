@@ -122,22 +122,27 @@ class Car {
     accelerateButton: HTMLButtonElement,
     breakButton: HTMLButtonElement
   ) {
+    const MS_IN_SEC = 1000;
+    const FRAMES_PER_SEC = 60;
+    const RESPONSE_TIME = Math.floor(1000 / FRAMES_PER_SEC);
     clearInterval(this.intervalId);
     let deltaPx = 0;
-    breakButton.disabled = false;
-    accelerateButton.disabled = true;
+    Car.toggleAccelerateBreakButtons(accelerateButton, breakButton, "drive");
     this.intervalId = setInterval(() => {
       if (response.status === 500) {
         clearInterval(this.intervalId);
       } else if (this.distance && deltaPx >= this.distance) {
         clearInterval(this.intervalId);
-        breakButton.disabled = true;
-        accelerateButton.disabled = false;
+        Car.toggleAccelerateBreakButtons(
+          accelerateButton,
+          breakButton,
+          "break"
+        );
       } else if (this.element && this.velocity) {
-        deltaPx += (this.velocity / 1000) * 16;
+        deltaPx += (this.velocity / MS_IN_SEC) * RESPONSE_TIME;
         this.element.style.left = `${deltaPx}px`;
       }
-    }, 16);
+    }, RESPONSE_TIME);
   }
 
   stopCarAnimation(
@@ -150,10 +155,27 @@ class Car {
         if (data === 200 && this.element) {
           clearInterval(this.intervalId);
           this.element.style.left = "0";
-          accelerateButton.disabled = false;
-          breakButton.disabled = true;
+          Car.toggleAccelerateBreakButtons(
+            accelerateButton,
+            breakButton,
+            "break"
+          );
         }
       });
+    }
+  }
+
+  static toggleAccelerateBreakButtons(
+    accelerateButton: HTMLButtonElement,
+    breakButton: HTMLButtonElement,
+    status: "drive" | "break"
+  ) {
+    if (status === "drive") {
+      breakButton.disabled = false;
+      accelerateButton.disabled = true;
+    } else {
+      breakButton.disabled = true;
+      accelerateButton.disabled = false;
     }
   }
 }
