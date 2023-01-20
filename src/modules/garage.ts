@@ -158,9 +158,9 @@ class Garage {
       }
       if (mode === "race") {
         this.startRace(cars);
-      } /* else {
+      } else {
         this.resetRace(cars);
-      } */
+      }
     };
 
     return button;
