@@ -6,7 +6,6 @@ import {
   updateCar,
   toggleCarEngine,
   toggleDriveMode,
-  SpeedAndDistance,
 } from "./api";
 import Car from "./car";
 import finishFlagSrc from "../assets/finish-flag.svg";
@@ -154,67 +153,90 @@ class Garage {
     button.className = `${mode}`;
 
     button.onclick = () => {
+      const cars: Array<Car> = [];
+      for (let i = this.prevRange; i < this.currRange; i += 1) {
+        cars.push(this.carsInView[i]);
+      }
       if (mode === "race") {
-        const engineStartedPromises: Array<Promise<Response>> = [];
-        const cars: Array<Car> = [];
-        for (let i = this.prevRange; i < this.currRange; i += 1) {
-          cars.push(this.carsInView[i]);
-        }
-        cars.forEach((car) => {
-          if (car.id) {
-            engineStartedPromises.push(
-              toggleCarEngine(API_URL, car.id, "started", "Response")
-            );
-          }
-        });
-        const setProps = async (
-          result: PromiseSettledResult<Response>,
-          index: number
-        ) => {
-          if (result.status === "fulfilled") {
-            const data = await result.value.json();
-            const car = cars[index];
-            if (data instanceof Object && car.carContainer)
-              car.calculateSpeedDistanceAndTime(data, car.carContainer);
-          }
-        };
-        const startCarsEngine = async () =>
-          Promise.allSettled(engineStartedPromises);
-        const setSpeedAndDistanceOfCars = async (
-          results: PromiseSettledResult<Response>[]
-        ) => {
-          const promises: Array<Promise<void>> = [];
-          results.forEach((result, index) =>
-            promises.push(setProps(result, index))
-          );
-          return Promise.allSettled(promises);
-        };
-        const setCarsToDriveMode = async () => {
-          const promises: Array<Promise<Response>> = [];
-          cars.forEach((car) => {
-            if (car.id) {
-              promises.push(toggleDriveMode(API_URL, car.id));
-            }
-          });
-          return Promise.all(promises);
-        };
-        const startCarsAnimation = (responses: Response[]) => {
-          responses.forEach((response, index) => {
-            const car = cars[index];
-            if (car.accelerateButton && car.brakeButton)
-              car.moveCar(response, car.accelerateButton, car.brakeButton);
-          });
-        };
-        startCarsEngine()
-          .then((results) => setSpeedAndDistanceOfCars(results))
-          .then(() => setCarsToDriveMode())
-          .then((result) => startCarsAnimation(result));
+        this.startRace(cars);
       } else {
-        //
+        this.resetRace(cars);
       }
     };
 
     return button;
+  }
+
+  private startRace(cars: Car[]) {
+    const engineStartedPromises: Array<Promise<Response>> = [];
+    cars.forEach((car) => {
+      if (car.id) {
+        engineStartedPromises.push(
+          toggleCarEngine(API_URL, car.id, "started", "Response")
+        );
+      }
+    });
+    const setProps = async (
+      result: PromiseSettledResult<Response>,
+      index: number
+    ) => {
+      if (result.status === "fulfilled") {
+        const data = await result.value.json();
+        const car = cars[index];
+        if (data instanceof Object && car.carContainer)
+          car.calculateSpeedDistanceAndTime(data, car.carContainer);
+      }
+    };
+    const startCarsEngine = async () =>
+      Promise.allSettled(engineStartedPromises);
+    const setSpeedAndDistanceOfCars = async (
+      results: PromiseSettledResult<Response>[]
+    ) => {
+      const promises: Array<Promise<void>> = [];
+      results.forEach((result, index) =>
+        promises.push(setProps(result, index))
+      );
+      return Promise.allSettled(promises);
+    };
+    const setCarsToDriveMode = async () => {
+      const promises: Array<Promise<Response>> = [];
+      cars.forEach((car) => {
+        if (car.id) {
+          promises.push(toggleDriveMode(API_URL, car.id));
+        }
+      });
+      return Promise.all(promises);
+    };
+    const startCarsAnimation = (responses: Response[]) => {
+      responses.forEach((response, index) => {
+        const car = cars[index];
+        if (car.accelerateButton && car.brakeButton)
+          car.moveCar(response, car.accelerateButton, car.brakeButton);
+      });
+    };
+    startCarsEngine()
+      .then((results) => setSpeedAndDistanceOfCars(results))
+      .then(() => setCarsToDriveMode())
+      .then((result) => startCarsAnimation(result));
+  }
+
+  private resetRace(cars: Car[]) {
+    const promises: Array<Promise<Response>> = [];
+    cars.forEach((car) => {
+      if (car.id)
+        promises.push(toggleCarEngine(API_URL, car.id, "stopped", "Response"));
+    });
+    Promise.all(promises).then(() => {
+      cars.forEach((car) => {
+        if (car.accelerateButton && car.brakeButton)
+          car.stopCarAnimation(
+            API_URL,
+            car.accelerateButton,
+            car.brakeButton,
+            true
+          );
+      });
+    });
   }
 
   private createHeading() {

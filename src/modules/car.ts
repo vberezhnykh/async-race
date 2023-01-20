@@ -150,20 +150,31 @@ class Car {
   stopCarAnimation(
     url: string,
     accelerateButton: HTMLButtonElement,
-    breakButton: HTMLButtonElement
+    breakButton: HTMLButtonElement,
+    engineStopped?: boolean
   ) {
     if (this.id) {
-      toggleCarEngine(url, this.id, "stopped").then((data) => {
-        if (data === 200 && this.carElement) {
-          clearInterval(this.intervalId);
-          this.carElement.style.left = "0";
-          Car.toggleAccelerateBreakButtons(
-            accelerateButton,
-            breakButton,
-            "break"
-          );
-        }
-      });
+      if (!engineStopped) {
+        toggleCarEngine(url, this.id, "stopped").then((data) => {
+          if (data === 200 && this.carElement) {
+            clearInterval(this.intervalId);
+            this.carElement.style.left = "0";
+            Car.toggleAccelerateBreakButtons(
+              accelerateButton,
+              breakButton,
+              "break"
+            );
+          }
+        });
+      } else if (engineStopped && this.carElement) {
+        clearInterval(this.intervalId);
+        this.carElement.style.left = "0";
+        Car.toggleAccelerateBreakButtons(
+          accelerateButton,
+          breakButton,
+          "break"
+        );
+      }
     }
   }
 
