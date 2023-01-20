@@ -95,7 +95,7 @@ class Car {
     url: string,
     container: HTMLLIElement,
     accelerateButton: HTMLButtonElement,
-    breakButton: HTMLButtonElement
+    brakeButton: HTMLButtonElement
   ) {
     if (this.id) {
       toggleCarEngine(url, this.id, "started")
@@ -104,10 +104,7 @@ class Car {
             this.calculateSpeedDistanceAndTime(data, container);
         })
         .then(() => {
-          if (this.id)
-            toggleDriveMode(url, this.id).then((data) => {
-              this.moveCar(data, accelerateButton, breakButton);
-            });
+          if (this.id) this.moveCar(accelerateButton, brakeButton);
         });
     }
   }
@@ -129,8 +126,7 @@ class Car {
     }
   }
 
-  moveCar(
-    response: Response,
+  async moveCar(
     accelerateButton: HTMLButtonElement,
     breakButton: HTMLButtonElement,
     isRace?: boolean
@@ -138,13 +134,13 @@ class Car {
     const MS_IN_SEC = 1000;
     const FRAMES_PER_SEC = 60;
     const RESPONSE_TIME = Math.floor(1000 / FRAMES_PER_SEC);
+    let promise: Promise<Response>;
+    if (this.id) promise = toggleDriveMode(API_URL, this.id);
     clearInterval(this.intervalId);
     let deltaPx = 0;
     Car.toggleAccelerateBreakButtons(accelerateButton, breakButton, "drive");
-    this.intervalId = setInterval(() => {
-      if (response.status === 500) {
-        clearInterval(this.intervalId);
-      } else if (this.distance && deltaPx >= this.distance) {
+    this.intervalId = setInterval(async () => {
+      if (this.distance && deltaPx >= this.distance) {
         clearInterval(this.intervalId);
         Car.toggleAccelerateBreakButtons(
           accelerateButton,
@@ -182,6 +178,9 @@ class Car {
       } else if (this.carElement && this.velocity) {
         deltaPx += (this.velocity / MS_IN_SEC) * RESPONSE_TIME;
         this.carElement.style.left = `${deltaPx}px`;
+        await promise.then((response) => {
+          if (response.status === 500) clearInterval(this.intervalId);
+        });
       }
     }, RESPONSE_TIME);
   }

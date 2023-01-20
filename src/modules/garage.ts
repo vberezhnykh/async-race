@@ -157,17 +157,17 @@ class Garage {
       for (let i = this.prevRange; i < this.currRange; i += 1) {
         cars.push(this.carsInView[i]);
       }
-      if (mode === "race") {
+      /* if (mode === "race") {
         this.startRace(cars);
       } else {
         this.resetRace(cars);
-      }
+      } */
     };
 
     return button;
   }
 
-  private startRace(cars: Car[]) {
+  /* private startRace(cars: Car[]) {
     const engineStartedPromises: Array<Promise<Response>> = [];
     cars.forEach((car) => {
       if (car.id) {
@@ -237,7 +237,7 @@ class Garage {
           );
       });
     });
-  }
+  } */
 
   private createHeading() {
     const header = document.createElement("h2");
