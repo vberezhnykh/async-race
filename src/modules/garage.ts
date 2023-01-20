@@ -5,7 +5,6 @@ import {
   getCars,
   updateCar,
   toggleCarEngine,
-  toggleDriveMode,
 } from "./api";
 import Car from "./car";
 import finishFlagSrc from "../assets/finish-flag.svg";
@@ -155,11 +154,11 @@ class Garage {
     button.onclick = () => {
       const cars: Array<Car> = [];
       for (let i = this.prevRange; i < this.currRange; i += 1) {
-        cars.push(this.carsInView[i]);
+        if (this.carsInView[i]) cars.push(this.carsInView[i]);
       }
-      /* if (mode === "race") {
+      if (mode === "race") {
         this.startRace(cars);
-      } else {
+      } /* else {
         this.resetRace(cars);
       } */
     };
@@ -167,8 +166,8 @@ class Garage {
     return button;
   }
 
-  /* private startRace(cars: Car[]) {
-    const engineStartedPromises: Array<Promise<Response>> = [];
+  private startRace(cars: Car[]) {
+    const engineStartedPromises: Promise<Response>[] = [];
     cars.forEach((car) => {
       if (car.id) {
         engineStartedPromises.push(
@@ -196,28 +195,17 @@ class Garage {
       results.forEach((result, index) =>
         promises.push(setProps(result, index))
       );
-      return Promise.allSettled(promises);
-    };
-    const setCarsToDriveMode = async () => {
-      const promises: Array<Promise<Response>> = [];
-      cars.forEach((car) => {
-        if (car.id) {
-          promises.push(toggleDriveMode(API_URL, car.id));
-        }
-      });
       return Promise.all(promises);
     };
-    const startCarsAnimation = (responses: Response[]) => {
-      responses.forEach((response, index) => {
-        const car = cars[index];
+    const startCarsAnimation = () => {
+      cars.forEach((car) => {
         if (car.accelerateButton && car.brakeButton)
-          car.moveCar(response, car.accelerateButton, car.brakeButton, true);
+          car.moveCar(car.accelerateButton, car.brakeButton, true);
       });
     };
     startCarsEngine()
       .then((results) => setSpeedAndDistanceOfCars(results))
-      .then(() => setCarsToDriveMode())
-      .then((result) => startCarsAnimation(result));
+      .then(() => startCarsAnimation());
   }
 
   private resetRace(cars: Car[]) {
@@ -237,7 +225,7 @@ class Garage {
           );
       });
     });
-  } */
+  }
 
   private createHeading() {
     const header = document.createElement("h2");
