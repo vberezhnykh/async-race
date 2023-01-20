@@ -1,6 +1,6 @@
 import Controls from "./controls";
 import Garage from "./garage";
-import { Winners } from "./winners";
+import Winners from "./winners";
 
 export class App {
   Controls: Controls;
@@ -18,6 +18,9 @@ export class App {
   static createMain() {
     const main = document.createElement("main");
     main.classList.add("main");
+    const garageContainer = document.createElement("section");
+    garageContainer.classList.add("garage-container");
+    main.appendChild(garageContainer);
     return main;
   }
 

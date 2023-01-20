@@ -1,5 +1,5 @@
 import Garage from "./garage";
-import { Winners } from "./winners";
+import Winners from "./winners";
 
 class Controls {
   Garage: Garage;
@@ -25,13 +25,17 @@ class Controls {
   }
 
   private clearAndUpdateView(event: MouseEvent) {
-    const main = document.querySelector(".main");
+    const garageContainer = document.querySelector(".garage-container");
     const button = event.target;
-    if (main) {
-      main.innerHTML = "";
+    if (garageContainer) {
       if (button instanceof HTMLButtonElement) {
-        if (button.textContent === "TO GARAGE") this.Garage.render();
-        /* if (button.textContent === 'TO WINNERS')  */
+        if (button.textContent === "TO GARAGE") {
+          garageContainer.classList.remove("garage-container--hidden");
+        }
+        if (button.textContent === "TO WINNERS") {
+          garageContainer.classList.add("garage-container--hidden");
+          this.Winners.render();
+        }
       }
     }
   }

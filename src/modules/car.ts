@@ -1,7 +1,10 @@
 import {
+  createWinner,
+  getWinner,
   SpeedAndDistance,
   toggleCarEngine,
   toggleDriveMode,
+  updateWinner,
   Сharacteristics,
 } from "./api";
 
@@ -30,6 +33,10 @@ const CAR_MODELS = [
   "Sport",
   "AMG GT",
 ];
+
+let winningCar: null | number = null;
+
+const API_URL = "http://127.0.0.1:3000";
 
 class Car {
   name: string;
@@ -115,14 +122,18 @@ class Car {
         container.getBoundingClientRect().width -
           this.carElement.getBoundingClientRect().width
       );
-      this.time = this.distance / this.velocity;
+      const [seconds, ms] = (this.distance / this.velocity)
+        .toString()
+        .split(".");
+      this.time = Number(`${seconds}.${ms.slice(0, 2)}`);
     }
   }
 
   moveCar(
     response: Response,
     accelerateButton: HTMLButtonElement,
-    breakButton: HTMLButtonElement
+    breakButton: HTMLButtonElement,
+    isRace?: boolean
   ) {
     const MS_IN_SEC = 1000;
     const FRAMES_PER_SEC = 60;
@@ -140,6 +151,34 @@ class Car {
           breakButton,
           "break"
         );
+        if (isRace && winningCar === null && this.id) {
+          winningCar = this.id;
+          getWinner(API_URL, winningCar).then((winnerResponse) => {
+            if (
+              Object.keys(winnerResponse).length === 0 &&
+              winningCar &&
+              this.time
+            ) {
+              createWinner(API_URL, {
+                id: winningCar,
+                wins: 1,
+                time: this.time,
+              });
+            } else if (
+              winningCar &&
+              Object.keys(winnerResponse).length !== 0 &&
+              this.time
+            ) {
+              const params = {
+                wins: winnerResponse.wins,
+                time: winnerResponse.time,
+              };
+              if (params.time > this.time) params.time = this.time;
+              params.wins += 1;
+              updateWinner(API_URL, winningCar, params);
+            }
+          });
+        }
       } else if (this.carElement && this.velocity) {
         deltaPx += (this.velocity / MS_IN_SEC) * RESPONSE_TIME;
         this.carElement.style.left = `${deltaPx}px`;

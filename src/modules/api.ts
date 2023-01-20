@@ -63,7 +63,7 @@ export async function toggleCarEngine(
   url: string,
   id: number,
   status: "started" | "stopped",
-  returnedValue?: "Response" | "data"
+  returnedValue?: "Response"
 ) {
   const response = await fetch(`${url}/engine?id=${id}&status=${status}`, {
     method: "PATCH",
@@ -123,7 +123,7 @@ export async function getWinner(url: string, id: number) {
   return response.json();
 }
 
-type SingleWinnerParams = {
+export type SingleWinnerParams = {
   id: number;
   wins: number;
   time: number;

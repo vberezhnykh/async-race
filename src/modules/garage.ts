@@ -50,16 +50,16 @@ class Garage {
 
   render() {
     this.getCarsAndSetProps().then(() => {
-      const main = document.querySelector(".main");
-      if (main) {
-        main.appendChild(this.createCreateInput());
-        main.appendChild(this.createUpdateInput());
-        main.appendChild(this.createRaceButtons("race"));
-        main.appendChild(this.createRaceButtons("reset"));
-        main.appendChild(this.createGenerateButton());
-        main.appendChild(this.createHeading());
-        main.appendChild(this.createPagination());
-        main.appendChild(this.createListOfCars());
+      const garageContainer = document.querySelector(".garage-container");
+      if (garageContainer) {
+        garageContainer.appendChild(this.createCreateInput());
+        garageContainer.appendChild(this.createUpdateInput());
+        garageContainer.appendChild(this.createRaceButtons("race"));
+        garageContainer.appendChild(this.createRaceButtons("reset"));
+        garageContainer.appendChild(this.createGenerateButton());
+        garageContainer.appendChild(this.createHeading());
+        garageContainer.appendChild(this.createPagination());
+        garageContainer.appendChild(this.createListOfCars());
       }
     });
   }
@@ -94,8 +94,8 @@ class Garage {
   private updateView() {
     this.getCarsAndSetProps().then(() => {
       this.carsInView = [];
-      const main = document.querySelector(".main");
-      if (main) main.innerHTML = "";
+      const garageContainer = document.querySelector(".garage-container");
+      if (garageContainer) garageContainer.innerHTML = "";
       this.render();
     });
   }
@@ -211,7 +211,7 @@ class Garage {
       responses.forEach((response, index) => {
         const car = cars[index];
         if (car.accelerateButton && car.brakeButton)
-          car.moveCar(response, car.accelerateButton, car.brakeButton);
+          car.moveCar(response, car.accelerateButton, car.brakeButton, true);
       });
     };
     startCarsEngine()
