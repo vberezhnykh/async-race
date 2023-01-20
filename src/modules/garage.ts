@@ -4,6 +4,9 @@ import {
   deleteCar,
   getCars,
   updateCar,
+  toggleCarEngine,
+  toggleDriveMode,
+  SpeedAndDistance,
 } from "./api";
 import Car from "./car";
 import finishFlagSrc from "../assets/finish-flag.svg";
@@ -30,6 +33,8 @@ class Garage {
 
   private currRange = 7;
 
+  private carsInView: Array<Car> = [];
+
   private getCarsAndSetProps() {
     return getCars(API_URL).then((data) => {
       if (data instanceof Object) {
@@ -50,6 +55,8 @@ class Garage {
       if (main) {
         main.appendChild(this.createCreateInput());
         main.appendChild(this.createUpdateInput());
+        main.appendChild(this.createRaceButtons("race"));
+        main.appendChild(this.createRaceButtons("reset"));
         main.appendChild(this.createGenerateButton());
         main.appendChild(this.createHeading());
         main.appendChild(this.createPagination());
@@ -87,6 +94,7 @@ class Garage {
 
   private updateView() {
     this.getCarsAndSetProps().then(() => {
+      this.carsInView = [];
       const main = document.querySelector(".main");
       if (main) main.innerHTML = "";
       this.render();
@@ -137,6 +145,75 @@ class Garage {
       }
       this.updateView();
     };
+    return button;
+  }
+
+  private createRaceButtons(mode: "race" | "reset") {
+    const button = document.createElement("button");
+    button.innerHTML = mode.toUpperCase();
+    button.className = `${mode}`;
+
+    button.onclick = () => {
+      if (mode === "race") {
+        const engineStartedPromises: Array<Promise<Response>> = [];
+        const cars: Array<Car> = [];
+        for (let i = this.prevRange; i < this.currRange; i += 1) {
+          cars.push(this.carsInView[i]);
+        }
+        cars.forEach((car) => {
+          if (car.id) {
+            engineStartedPromises.push(
+              toggleCarEngine(API_URL, car.id, "started", "Response")
+            );
+          }
+        });
+        const setProps = async (
+          result: PromiseSettledResult<Response>,
+          index: number
+        ) => {
+          if (result.status === "fulfilled") {
+            const data = await result.value.json();
+            const car = cars[index];
+            if (data instanceof Object && car.carContainer)
+              car.calculateSpeedDistanceAndTime(data, car.carContainer);
+          }
+        };
+        const startCarsEngine = async () =>
+          Promise.allSettled(engineStartedPromises);
+        const setSpeedAndDistanceOfCars = async (
+          results: PromiseSettledResult<Response>[]
+        ) => {
+          const promises: Array<Promise<void>> = [];
+          results.forEach((result, index) =>
+            promises.push(setProps(result, index))
+          );
+          return Promise.allSettled(promises);
+        };
+        const setCarsToDriveMode = async () => {
+          const promises: Array<Promise<Response>> = [];
+          cars.forEach((car) => {
+            if (car.id) {
+              promises.push(toggleDriveMode(API_URL, car.id));
+            }
+          });
+          return Promise.all(promises);
+        };
+        const startCarsAnimation = (responses: Response[]) => {
+          responses.forEach((response, index) => {
+            const car = cars[index];
+            if (car.accelerateButton && car.brakeButton)
+              car.moveCar(response, car.accelerateButton, car.brakeButton);
+          });
+        };
+        startCarsEngine()
+          .then((results) => setSpeedAndDistanceOfCars(results))
+          .then(() => setCarsToDriveMode())
+          .then((result) => startCarsAnimation(result));
+      } else {
+        //
+      }
+    };
+
     return button;
   }
 
@@ -199,6 +276,7 @@ class Garage {
     nav: HTMLElement,
     paginationNumber: HTMLSpanElement
   ) {
+    this.carsInView = [];
     this.handlePrevButton(prevButton);
     this.handleNextButton(nextButton);
     document.querySelector(".car-list")?.remove();
@@ -211,7 +289,9 @@ class Garage {
     listOfCars.classList.add("car-list");
     this.carsInGarage?.forEach((carInGarage, index) => {
       const car = new Car(false, carInGarage);
+      this.carsInView.push(car);
       const container = document.createElement("li");
+      car.carContainer = container;
       container.classList.add("car-list__item");
       this.createSelectAndRemoveButtons(index, container, car);
       Garage.createCarName(car, container);
@@ -240,7 +320,7 @@ class Garage {
     );
     image.innerHTML = svgImage;
     track.append(image);
-    car.element = image;
+    car.carElement = image;
     // изображение флага
     const flag = new Image();
     flag.classList.add("flag");
@@ -254,17 +334,19 @@ class Garage {
     driveButtonsContainer.classList.add("drive-buttons");
     const accelerateButton = document.createElement("button");
     accelerateButton.textContent = "A";
+    car.accelerateButton = accelerateButton;
     driveButtonsContainer.append(accelerateButton);
-    const breakButton = document.createElement("button");
-    breakButton.textContent = "B";
-    breakButton.disabled = true;
-    driveButtonsContainer.append(breakButton);
+    const brakeButton = document.createElement("button");
+    brakeButton.textContent = "B";
+    car.brakeButton = brakeButton;
+    brakeButton.disabled = true;
+    driveButtonsContainer.append(brakeButton);
     container.append(driveButtonsContainer);
     accelerateButton.onclick = () => {
-      car.animateCar(API_URL, container, accelerateButton, breakButton);
+      car.animateCar(API_URL, container, accelerateButton, brakeButton);
     };
-    breakButton.onclick = () => {
-      car.stopCarAnimation(API_URL, accelerateButton, breakButton);
+    brakeButton.onclick = () => {
+      car.stopCarAnimation(API_URL, accelerateButton, brakeButton);
     };
   }
 

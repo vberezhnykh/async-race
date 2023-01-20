@@ -44,15 +44,17 @@ class Car {
 
   time?: number;
 
-  element?: HTMLDivElement;
+  carElement?: HTMLDivElement;
+
+  carContainer?: HTMLLIElement;
 
   start?: number;
 
-  previousTimeStamp?: number;
-
-  animationFinished = false;
-
   intervalId?: ReturnType<typeof setInterval>;
+
+  accelerateButton?: HTMLButtonElement;
+
+  brakeButton?: HTMLButtonElement;
 
   constructor(isRandom: boolean, characteristics?: Сharacteristics) {
     if (!isRandom && characteristics) {
@@ -103,15 +105,15 @@ class Car {
     }
   }
 
-  private calculateSpeedDistanceAndTime(
+  calculateSpeedDistanceAndTime(
     data: SpeedAndDistance,
     container: HTMLLIElement
   ) {
     this.velocity = data.velocity;
-    if (this.element) {
+    if (this.carElement) {
       this.distance = Math.floor(
         container.getBoundingClientRect().width -
-          this.element.getBoundingClientRect().width
+          this.carElement.getBoundingClientRect().width
       );
       this.time = this.distance / this.velocity;
     }
@@ -138,9 +140,9 @@ class Car {
           breakButton,
           "break"
         );
-      } else if (this.element && this.velocity) {
+      } else if (this.carElement && this.velocity) {
         deltaPx += (this.velocity / MS_IN_SEC) * RESPONSE_TIME;
-        this.element.style.left = `${deltaPx}px`;
+        this.carElement.style.left = `${deltaPx}px`;
       }
     }, RESPONSE_TIME);
   }
@@ -152,9 +154,9 @@ class Car {
   ) {
     if (this.id) {
       toggleCarEngine(url, this.id, "stopped").then((data) => {
-        if (data === 200 && this.element) {
+        if (data === 200 && this.carElement) {
           clearInterval(this.intervalId);
-          this.element.style.left = "0";
+          this.carElement.style.left = "0";
           Car.toggleAccelerateBreakButtons(
             accelerateButton,
             breakButton,

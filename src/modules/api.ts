@@ -62,11 +62,13 @@ export async function updateCar(url: string, id: number, params: CarParams) {
 export async function toggleCarEngine(
   url: string,
   id: number,
-  status: "started" | "stopped"
+  status: "started" | "stopped",
+  returnedValue?: "Response" | "data"
 ) {
   const response = await fetch(`${url}/engine?id=${id}&status=${status}`, {
     method: "PATCH",
   });
+  if (returnedValue === "Response") return response;
   if (response.ok && status === "started") return response.json();
   return response.status;
 }
