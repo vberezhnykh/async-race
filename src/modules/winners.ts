@@ -8,11 +8,14 @@ class Winners {
 
   winnersCars: Сharacteristics[] = [];
 
+  orderBy: "wins" | "time" | null = null;
+
+  sortOrder: "DESC" | "ASC" = "ASC";
+
   constructor() {
     getWinners(API_URL)
       .then((data) => {
         this.winners = data.winners;
-        // console.log(this.winners);
       })
       .then(() => {
         const promises: Promise<Response>[] = [];
@@ -30,11 +33,6 @@ class Winners {
         if (isСharacteristicsArray(result)) {
           this.winnersCars = result;
         }
-        /* console.log(result);
-        const checkResultType = (result: unknown) => {
-
-        } */
-        // this.winnersCars = result;
       });
   }
 
@@ -65,6 +63,7 @@ class Winners {
   }
 
   private createWinnersList() {
+    console.log(this.winnersCars);
     const winnerList = document.createElement("ul");
     winnerList.classList.add("winner-list");
     for (let i = 0; i < this.winnersCars.length; i += 1) {
@@ -127,6 +126,24 @@ class Winners {
     const wins = document.createElement("div");
     wins.innerHTML = "Wins";
     wins.classList.add("leader-board__wins-cell");
+    wins.onclick = () => {
+      if (this.sortOrder === "ASC") this.sortOrder = "DESC";
+      else this.sortOrder = "ASC";
+      this.orderBy = "wins";
+      this.winners.sort((a, b) => {
+        if (this.sortOrder === "DESC") return b.wins - a.wins;
+        return a.wins - b.wins;
+      });
+      const winnersCarsCopy: Сharacteristics[] = [];
+      this.winners.forEach((winner) => {
+        const elem = this.winnersCars.find(
+          (winnerCar) => winnerCar.id === winner.id
+        );
+        if (elem) winnersCarsCopy.push(elem);
+      });
+      this.winnersCars = winnersCarsCopy.map((winnerCar) => winnerCar);
+      this.render();
+    };
     header.appendChild(wins);
     const bestTime = document.createElement("div");
     bestTime.innerHTML = "Best time (seconds)";

@@ -81,6 +81,10 @@ body {
   flex-basis: 3rem;
 }
 
+.leader-board__header {
+  cursor: pointer;
+}
+
 .leader-board__number-cell {
   flex-basis: 4rem;
 }
@@ -99,6 +103,5 @@ body {
 .winner-list__item {
   display: flex;
   align-items: center;
-  
   gap: 25px;
 }
