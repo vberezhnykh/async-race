@@ -338,15 +338,12 @@ class Garage {
       this.carsInView.push(car);
       const container = document.createElement("li");
       car.carContainer = container;
-      container.classList.add(
-        "car-list__item" /* , "car-list__item--hidden" */
-      );
+      container.classList.add("car-list__item");
       this.createSelectAndRemoveButtons(index, container, car);
       Garage.createCarName(car, container);
       Garage.createCarControls(container, car);
       Garage.createTrack(carInGarage, container, car);
       if (index >= this.prevRange && index < this.currRange) {
-        // container.classList.remove("car-list__item--hidden");
         listOfCars.appendChild(container);
       }
     });
@@ -430,9 +427,12 @@ class Garage {
   }
 
   private deleteCarAndUpdateView(id: number, index: number) {
-    if (index === this.prevRange) {
-      this.currentPage -= 1;
-      this.updatePageRanges();
+    if (this.carsInGarage) {
+      const lastIndex = this.carsInGarage.length - 1;
+      if (index === this.prevRange && index === lastIndex) {
+        this.currentPage -= 1;
+        this.updatePageRanges();
+      }
     }
     deleteCar(API_URL, id).then(() => {
       if (this.carsInGarage) {
