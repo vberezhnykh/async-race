@@ -12,7 +12,7 @@ class Winners {
       })
       .then(() => {
         this.winners.forEach((winner) => {
-          console.log(winner);
+          // console.log(winner);
         });
       });
   }

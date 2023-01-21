@@ -1,6 +1,6 @@
 export type Сharacteristics = {
   name: string;
-  color: "string";
+  color: string;
   id: number;
 };
 

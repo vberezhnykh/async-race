@@ -13,9 +13,9 @@ import { defaultCarImage } from "./carImage";
 const API_URL = "http://127.0.0.1:3000";
 
 class Garage {
-  private totalNumberOfCars?: string;
+  private totalNumberOfCars: string | null = null;
 
-  private carsInGarage?: Array<Сharacteristics>;
+  private carsInGarage: Array<Сharacteristics> | null = null;
 
   private selectedCarId?: number;
 
@@ -48,10 +48,16 @@ class Garage {
   }
 
   render() {
+    if (this.totalNumberOfCars === null || this.carsInGarage === null) {
+      this.getCarsAndSetProps().then(() => this.createElements());
+    } else this.createElements();
+  }
+
+  private createElements() {
     this.getCarsAndSetProps().then(() => {
       const garageContainer = document.querySelector(".garage-container");
       if (garageContainer) {
-        garageContainer.appendChild(this.createCreateInput());
+        garageContainer.appendChild(this.createCarCreateInput());
         garageContainer.appendChild(this.createUpdateInput());
         garageContainer.appendChild(this.createRaceButtons("race"));
         garageContainer.appendChild(this.createRaceButtons("reset"));
@@ -63,7 +69,7 @@ class Garage {
     });
   }
 
-  private createCreateInput() {
+  private createCarCreateInput() {
     const container = document.createElement("div");
     const input = document.createElement("input");
     container.append(input);
@@ -87,16 +93,24 @@ class Garage {
     createCar(API_URL, {
       name: input.value,
       color: colorInput.value,
-    }).then(() => this.updateView());
+    }).then(() => {
+      if (this.carsInGarage) {
+        const lastCarId = this.carsInGarage[this.carsInGarage.length - 1].id;
+        this.carsInGarage.push({
+          name: input.value,
+          color: colorInput.value,
+          id: lastCarId + 1,
+        });
+      }
+      this.updateView();
+    });
   }
 
   private updateView() {
-    this.getCarsAndSetProps().then(() => {
-      this.carsInView = [];
-      const garageContainer = document.querySelector(".garage-container");
-      if (garageContainer) garageContainer.innerHTML = "";
-      this.render();
-    });
+    this.carsInView = [];
+    const garageContainer = document.querySelector(".garage-container");
+    if (garageContainer) garageContainer.innerHTML = "";
+    this.render();
   }
 
   private createUpdateInput() {
@@ -126,7 +140,21 @@ class Garage {
       updateCar(API_URL, this.selectedCarId, {
         name: input.value,
         color: colorInput.value,
-      }).then(() => this.updateView());
+      }).then(() => {
+        if (this.carsInGarage) {
+          this.carsInGarage = this.carsInGarage.map((carInGarage) => {
+            if (carInGarage.id === this.selectedCarId) {
+              return {
+                name: input.value,
+                color: colorInput.value,
+                id: this.selectedCarId,
+              };
+            }
+            return carInGarage;
+          });
+        }
+        this.updateView();
+      });
     }
   }
 
@@ -140,6 +168,14 @@ class Garage {
           name: car.name,
           color: car.color,
         });
+        if (this.carsInGarage) {
+          const lastId = this.carsInGarage[this.carsInGarage.length - 1].id;
+          this.carsInGarage.push({
+            name: car.name,
+            color: car.color,
+            id: lastId + 1,
+          });
+        }
       }
       this.updateView();
     };
@@ -157,16 +193,16 @@ class Garage {
         if (this.carsInView[i]) cars.push(this.carsInView[i]);
       }
       if (mode === "race") {
-        this.startRace(cars);
+        Garage.startRace(cars);
       } else {
-        this.resetRace(cars);
+        Garage.resetRace(cars);
       }
     };
 
     return button;
   }
 
-  private startRace(cars: Car[]) {
+  static startRace(cars: Car[]) {
     const engineStartedPromises: Promise<Response>[] = [];
     cars.forEach((car) => {
       if (car.id) {
@@ -208,7 +244,7 @@ class Garage {
       .then(() => startCarsAnimation());
   }
 
-  private resetRace(cars: Car[]) {
+  static resetRace(cars: Car[]) {
     const promises: Array<Promise<Response>> = [];
     cars.forEach((car) => {
       if (car.id)
@@ -302,12 +338,15 @@ class Garage {
       this.carsInView.push(car);
       const container = document.createElement("li");
       car.carContainer = container;
-      container.classList.add("car-list__item");
+      container.classList.add(
+        "car-list__item" /* , "car-list__item--hidden" */
+      );
       this.createSelectAndRemoveButtons(index, container, car);
       Garage.createCarName(car, container);
       Garage.createCarControls(container, car);
       Garage.createTrack(carInGarage, container, car);
       if (index >= this.prevRange && index < this.currRange) {
+        // container.classList.remove("car-list__item--hidden");
         listOfCars.appendChild(container);
       }
     });
@@ -384,25 +423,25 @@ class Garage {
     const removeButton = document.createElement("button");
     removeButton.textContent = "REMOVE";
     removeButton.addEventListener("click", () => {
-      if (car.id) this.deleteCarAndUpdateView(car.id, index /* container */);
+      if (car.id) this.deleteCarAndUpdateView(car.id, index);
     });
     controlButtonsContainer.append(removeButton);
     container.append(controlButtonsContainer);
   }
 
-  private deleteCarAndUpdateView(
-    id: number,
-    index: number
-    /* container: HTMLLIElement */
-  ) {
+  private deleteCarAndUpdateView(id: number, index: number) {
     if (index === this.prevRange) {
       this.currentPage -= 1;
       this.updatePageRanges();
     }
-    deleteCar(API_URL, id).then(() =>
-      // container.remove()
-      this.updateView()
-    );
+    deleteCar(API_URL, id).then(() => {
+      if (this.carsInGarage) {
+        this.carsInGarage = this.carsInGarage.filter(
+          (carInGarage) => carInGarage.id !== id
+        );
+        this.updateView();
+      }
+    });
   }
 }
 

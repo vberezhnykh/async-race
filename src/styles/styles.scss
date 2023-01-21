@@ -9,6 +9,7 @@ body {
 }
 
 .garage-container {
+  /*  */
 }
 
 .garage-container--hidden {
@@ -30,6 +31,10 @@ body {
 .car-list__item {
   border-bottom: 2px dotted black;
   margin-bottom: 2px;
+}
+
+.car-list__item--hidden {
+  display: none;
 }
 
 .control-buttons {
