@@ -67,3 +67,38 @@ body {
 .flag {
   width: 64px;
 }
+
+.leader-board {
+  text-align: center;
+}
+
+.leader-board__header,
+.leader-board__wins-cell,
+.leader-board__best-time-cell {
+  display: flex;
+  align-items: center;
+  gap: 25px;
+  flex-basis: 3rem;
+}
+
+.leader-board__number-cell {
+  flex-basis: 4rem;
+}
+
+.leader-board__car-image-cell,
+.leader-board__name-cell {
+  flex-basis: 6rem;
+}
+
+.winner-list {
+  padding: 0;
+  list-style: none;
+  text-align: center;
+}
+
+.winner-list__item {
+  display: flex;
+  align-items: center;
+  
+  gap: 25px;
+}

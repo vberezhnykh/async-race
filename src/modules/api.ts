@@ -19,8 +19,9 @@ export async function getCars(address: string, limit?: number /* page */) {
 
 export async function getCar(url: string, id: number) {
   const response = await fetch(`${url}/garage/${id}`);
-  if (response.ok) return response.json();
-  return response.status;
+  /* if (response.ok) return response.json();
+  return response.status; */
+  return response.json();
 }
 
 export interface CarParams {

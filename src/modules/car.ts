@@ -144,6 +144,7 @@ class Car {
     let promise: Promise<Response>;
     if (this.id) promise = toggleDriveMode(API_URL, this.id);
     clearInterval(this.intervalId);
+    if (isRace) winningCar = null;
     let deltaPx = 0;
     Car.toggleAccelerateBreakButtons(accelerateButton, breakButton, "drive");
     this.intervalId = setInterval(async () => {
