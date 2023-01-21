@@ -126,30 +126,33 @@ class Winners {
     const wins = document.createElement("div");
     wins.innerHTML = "Wins";
     wins.classList.add("leader-board__wins-cell");
-    wins.onclick = () => {
-      if (this.sortOrder === "ASC") this.sortOrder = "DESC";
-      else this.sortOrder = "ASC";
-      this.orderBy = "wins";
-      this.winners.sort((a, b) => {
-        if (this.sortOrder === "DESC") return b.wins - a.wins;
-        return a.wins - b.wins;
-      });
-      const winnersCarsCopy: Сharacteristics[] = [];
-      this.winners.forEach((winner) => {
-        const elem = this.winnersCars.find(
-          (winnerCar) => winnerCar.id === winner.id
-        );
-        if (elem) winnersCarsCopy.push(elem);
-      });
-      this.winnersCars = winnersCarsCopy.map((winnerCar) => winnerCar);
-      this.render();
-    };
+    wins.onclick = () => this.sortBy("wins");
     header.appendChild(wins);
     const bestTime = document.createElement("div");
     bestTime.innerHTML = "Best time (seconds)";
     bestTime.classList.add("leader-board__best-time-cell");
+    bestTime.onclick = () => this.sortBy("time");
     header.appendChild(bestTime);
     return header;
+  }
+
+  private sortBy(sortby: "wins" | "time") {
+    if (this.sortOrder === "ASC") this.sortOrder = "DESC";
+    else this.sortOrder = "ASC";
+    this.orderBy = sortby;
+    this.winners.sort((a, b) => {
+      if (this.sortOrder === "DESC") return b[sortby] - a[sortby];
+      return a[sortby] - b[sortby];
+    });
+    const winnersCarsCopy: Сharacteristics[] = [];
+    this.winners.forEach((winner) => {
+      const elem = this.winnersCars.find(
+        (winnerCar) => winnerCar.id === winner.id
+      );
+      if (elem) winnersCarsCopy.push(elem);
+    });
+    this.winnersCars = winnersCarsCopy.map((winnerCar) => winnerCar);
+    this.render();
   }
 }
 
