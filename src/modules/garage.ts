@@ -8,7 +8,6 @@ import {
 } from "./api";
 import Car from "./car";
 import finishFlagSrc from "../assets/finish-flag.svg";
-import { defaultCarImage } from "./carImage";
 
 const API_URL = "http://127.0.0.1:3000";
 
@@ -342,65 +341,12 @@ class Garage {
       this.createSelectAndRemoveButtons(index, container, car);
       Garage.createCarName(car, container);
       Garage.createCarControls(container, car);
-      Garage.createTrack(carInGarage, container, car);
+      Garage.createTrack(container, car);
       if (index >= this.prevRange && index < this.currRange) {
         listOfCars.appendChild(container);
       }
     });
     return listOfCars;
-  }
-
-  static createTrack(
-    carInGarage: Сharacteristics,
-    container: HTMLLIElement,
-    car: Car
-  ) {
-    const track = document.createElement("div");
-    track.classList.add("track");
-    // изображение машины;
-    const image = document.createElement("div");
-    image.classList.add("car-image");
-    const svgImage = defaultCarImage.replace(
-      `fill="#000000"`,
-      `fill=${carInGarage.color}`
-    );
-    image.innerHTML = svgImage;
-    track.append(image);
-    car.carElement = image;
-    // изображение флага
-    const flag = new Image();
-    flag.classList.add("flag");
-    flag.src = finishFlagSrc;
-    track.append(flag);
-    container.append(track);
-  }
-
-  static createCarControls(container: HTMLLIElement, car: Car) {
-    const driveButtonsContainer = document.createElement("div");
-    driveButtonsContainer.classList.add("drive-buttons");
-    const accelerateButton = document.createElement("button");
-    accelerateButton.textContent = "A";
-    car.accelerateButton = accelerateButton;
-    driveButtonsContainer.append(accelerateButton);
-    const brakeButton = document.createElement("button");
-    brakeButton.textContent = "B";
-    car.brakeButton = brakeButton;
-    brakeButton.disabled = true;
-    driveButtonsContainer.append(brakeButton);
-    container.append(driveButtonsContainer);
-    accelerateButton.onclick = () => {
-      car.animateCar(API_URL, container, accelerateButton, brakeButton);
-    };
-    brakeButton.onclick = () => {
-      car.stopCarAnimation(API_URL, accelerateButton, brakeButton);
-    };
-  }
-
-  static createCarName(car: Car, container: HTMLLIElement) {
-    const carName = document.createElement("span");
-    carName.classList.add("car-list__car-name");
-    carName.textContent = car.name;
-    container.append(carName);
   }
 
   private createSelectAndRemoveButtons(
@@ -424,6 +370,51 @@ class Garage {
     });
     controlButtonsContainer.append(removeButton);
     container.append(controlButtonsContainer);
+  }
+
+  static createCarName(car: Car, container: HTMLLIElement) {
+    const carName = document.createElement("span");
+    carName.classList.add("car-list__car-name");
+    carName.textContent = car.name;
+    container.append(carName);
+  }
+
+  static createCarControls(container: HTMLLIElement, car: Car) {
+    const driveButtonsContainer = document.createElement("div");
+    driveButtonsContainer.classList.add("drive-buttons");
+    const accelerateButton = document.createElement("button");
+    accelerateButton.textContent = "A";
+    car.accelerateButton = accelerateButton;
+    driveButtonsContainer.append(accelerateButton);
+    const brakeButton = document.createElement("button");
+    brakeButton.textContent = "B";
+    car.brakeButton = brakeButton;
+    brakeButton.disabled = true;
+    driveButtonsContainer.append(brakeButton);
+    container.append(driveButtonsContainer);
+    accelerateButton.onclick = () => {
+      car.animateCar(API_URL, container, accelerateButton, brakeButton);
+    };
+    brakeButton.onclick = () => {
+      car.stopCarAnimation(API_URL, accelerateButton, brakeButton);
+    };
+  }
+
+  static createTrack(container: HTMLLIElement, car: Car) {
+    const track = document.createElement("div");
+    track.classList.add("track");
+    // изображение машины;
+    const image = document.createElement("div");
+    image.classList.add("car-image");
+    image.innerHTML = car.image;
+    track.append(image);
+    car.carElement = image;
+    // изображение флага
+    const flag = new Image();
+    flag.classList.add("flag");
+    flag.src = finishFlagSrc;
+    track.append(flag);
+    container.append(track);
   }
 
   private deleteCarAndUpdateView(id: number, index: number) {

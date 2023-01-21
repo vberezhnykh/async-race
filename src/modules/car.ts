@@ -7,6 +7,7 @@ import {
   updateWinner,
   Сharacteristics,
 } from "./api";
+import { defaultCarImage } from "./carImage";
 
 const CAR_BRANDS = [
   "Alpha Romeo",
@@ -45,6 +46,8 @@ class Car {
 
   id?: number;
 
+  image = defaultCarImage;
+
   velocity?: number;
 
   distance?: number;
@@ -68,6 +71,10 @@ class Car {
       this.name = characteristics.name;
       this.color = characteristics.color;
       this.id = characteristics.id;
+      this.image = this.image.replace(
+        `fill="#000000"`,
+        `fill=${characteristics.color}`
+      );
     } else {
       const brand = CAR_BRANDS[Car.getRandomIntInclusive(0, 9)];
       const model = CAR_MODELS[Car.getRandomIntInclusive(0, 9)];
