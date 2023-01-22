@@ -7,7 +7,7 @@ import {
   updateWinner,
   Сharacteristics,
 } from "./api";
-import { defaultCarImage } from "./carImage";
+import defaultCarImage from "./carImage";
 
 const CAR_BRANDS = [
   "Alpha Romeo",

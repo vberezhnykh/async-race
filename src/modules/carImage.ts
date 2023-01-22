@@ -1,4 +1,4 @@
-export const defaultCarImage = `<svg fill="#000000" height="64px" width="64px" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
+const defaultCarImage = `<svg fill="#000000" height="48px" width="64px" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
 viewBox="0 0 460.384 460.384" xml:space="preserve">
 <g>
 <path d="M95.252,283.11c-13.807,0-25.039,11.232-25.039,25.039s11.232,25.039,25.039,25.039s25.039-11.233,25.039-25.039
@@ -38,3 +38,5 @@ viewBox="0 0 460.384 460.384" xml:space="preserve">
  H214.352z"/>
 </g>
 </svg>`;
+
+export default defaultCarImage;

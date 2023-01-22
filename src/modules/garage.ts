@@ -21,6 +21,10 @@ class Garage {
 
   private updateButton?: HTMLButtonElement;
 
+  private updateNameInput?: HTMLInputElement;
+
+  private updateColorInput?: HTMLInputElement;
+
   private paginationLimit = 7;
 
   private pageCount = 1;
@@ -130,6 +134,8 @@ class Garage {
       this.updateCarAndView(input, colorInput)
     );
     this.updateButton = button;
+    this.updateNameInput = input;
+    this.updateColorInput = colorInput;
     container.append(button);
     return container;
   }
@@ -365,6 +371,8 @@ class Garage {
     selectButton.addEventListener("click", () => {
       this.selectedCarId = car.id;
       if (this.updateButton) this.updateButton.disabled = false;
+      if (this.updateNameInput) this.updateNameInput.value = car.name;
+      if (this.updateColorInput) this.updateColorInput.value = car.color;
     });
     controlButtonsContainer.append(selectButton);
     const removeButton = document.createElement("button");
