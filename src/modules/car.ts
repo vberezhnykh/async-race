@@ -157,6 +157,7 @@ class Car {
         );
         if (isRace && winningCar === null && this.id) {
           winningCar = this.id;
+          this.renderPopUp();
           getWinner(API_URL, winningCar).then((winnerResponse) => {
             if (winnerResponse === "404" && winningCar && this.time) {
               createWinner(API_URL, {
@@ -232,6 +233,19 @@ class Car {
       breakButton.disabled = true;
       accelerateButton.disabled = false;
     }
+  }
+
+  renderPopUp() {
+    const popup = document.createElement("div");
+    popup.className = "popup";
+    const text = document.createElement("span");
+    text.textContent = `${this.name} wins the race under ${this.time} sec!`;
+    popup.appendChild(text);
+    const closeBtn = document.createElement("button");
+    closeBtn.innerHTML = "close";
+    popup.appendChild(closeBtn);
+    closeBtn.onclick = () => popup.remove();
+    document.body.prepend(popup);
   }
 }
 
