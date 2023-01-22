@@ -5,6 +5,7 @@ import {
   getCars,
   updateCar,
   toggleCarEngine,
+  deleteWinner,
 } from "./api";
 import Car from "./car";
 import finishFlagSrc from "../assets/finish-flag.svg";
@@ -436,6 +437,7 @@ class Garage {
         this.updateView();
       }
     });
+    deleteWinner(API_URL, id);
   }
 }
 

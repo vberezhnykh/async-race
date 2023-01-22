@@ -19,8 +19,6 @@ export async function getCars(address: string, limit?: number /* page */) {
 
 export async function getCar(url: string, id: number) {
   const response = await fetch(`${url}/garage/${id}`);
-  /* if (response.ok) return response.json();
-  return response.status; */
   return response.json();
 }
 
@@ -127,6 +125,7 @@ export async function getWinner(url: string, id: number) {
       throw new Error();
     } else return res;
   } catch (err) {
+    // eslint-disable-next-line no-console
     console.error(
       "The car is not in the winning list. Adding car to the list..."
     );
