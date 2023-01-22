@@ -36,7 +36,11 @@ class Controls {
         }
         if (button.textContent === "TO WINNERS") {
           garageContainer.classList.add("garage-container--hidden");
-          this.Winners.render();
+          this.Winners.loadWinners().then(async (promise) => {
+            const res = await promise;
+            // console.log(res);
+            this.Winners.render();
+          });
         }
       }
     }

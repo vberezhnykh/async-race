@@ -159,10 +159,12 @@ class Car {
           winningCar = this.id;
           getWinner(API_URL, winningCar).then((winnerResponse) => {
             if (
-              Object.keys(winnerResponse).length === 0 &&
+              /* Object.keys(winnerResponse).length === 0 */ winnerResponse ===
+                "404" &&
               winningCar &&
               this.time
             ) {
+              console.log(winnerResponse);
               createWinner(API_URL, {
                 id: winningCar,
                 wins: 1,
@@ -170,7 +172,7 @@ class Car {
               });
             } else if (
               winningCar &&
-              Object.keys(winnerResponse).length !== 0 &&
+              winnerResponse instanceof Object &&
               this.time
             ) {
               const params = {

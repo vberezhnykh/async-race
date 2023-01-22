@@ -120,8 +120,18 @@ export async function getWinners(url: string, params?: WinnersParams) {
 }
 
 export async function getWinner(url: string, id: number) {
-  const response = await fetch(`${url}/winners/${id}`);
-  return response.json();
+  try {
+    const response = await fetch(`${url}/winners/${id}`);
+    const res = await response.json();
+    if (response.status === 404) {
+      throw new Error();
+    } else return res;
+  } catch (err) {
+    console.error(
+      "The car is not in the winning list. Adding car to the list..."
+    );
+    return "404";
+  }
 }
 
 export type SingleWinnerParams = {

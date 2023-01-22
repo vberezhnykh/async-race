@@ -12,7 +12,23 @@ class Winners {
 
   sortOrder: "DESC" | "ASC" = "ASC";
 
+  private paginationLimit = 10;
+
+  private pageCount = 1;
+
+  private currentPage = 1;
+
+  private prevRange = 0;
+
+  private currRange = 7;
+
+  // private carsInView: Array<Car>
+
   constructor() {
+    this.loadWinners();
+  }
+
+  async loadWinners() {
     getWinners(API_URL)
       .then((data) => {
         this.winners = data.winners;
@@ -44,6 +60,7 @@ class Winners {
     }
     winnersContainer.innerHTML = "";
     winnersContainer.appendChild(this.createHeading());
+    winnersContainer.appendChild(this.createPagination());
     winnersContainer.appendChild(this.createLeaderBoard());
     document.querySelector(".main")?.append(winnersContainer);
   }
@@ -52,6 +69,36 @@ class Winners {
     const heading = document.createElement("h2");
     heading.textContent = `Winners (${this.winners.length})`;
     return heading;
+  }
+
+  private createPagination() {
+    const nav = document.createElement("nav");
+    nav.classList.add("pagination-nav");
+    const prevButton = document.createElement("button");
+    prevButton.textContent = "←";
+    if (this.currentPage === 1) prevButton.disabled = true;
+    nav.append(prevButton);
+    const paginationNumber = document.createElement("span");
+    paginationNumber.classList.add("page-number");
+    paginationNumber.textContent = `Page #${this.currentPage}`;
+    nav.append(paginationNumber);
+    const nextButton = document.createElement("button");
+    nextButton.textContent = "→";
+    if (this.currentPage === this.pageCount) nextButton.disabled = true;
+    nav.append(nextButton);
+    /* prevButton.onclick = () => {
+      if (this.currentPage > 1) {
+        this.currentPage -= 1;
+        this.updateCarListView(prevButton, nextButton, nav, paginationNumber);
+      }
+    };
+    nextButton.onclick = () => {
+      if (this.currentPage < this.pageCount) {
+        this.currentPage += 1;
+        this.updateCarListView(prevButton, nextButton, nav, paginationNumber);
+      }
+    }; */
+    return nav;
   }
 
   private createLeaderBoard() {
@@ -63,7 +110,7 @@ class Winners {
   }
 
   private createWinnersList() {
-    console.log(this.winnersCars);
+    // console.log(this.winnersCars);
     const winnerList = document.createElement("ul");
     winnerList.classList.add("winner-list");
     for (let i = 0; i < this.winnersCars.length; i += 1) {
