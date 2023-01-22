@@ -106,9 +106,28 @@ body {
   flex-basis: 4rem;
 }
 
-.leader-board__car-image-cell,
-.leader-board__name-cell {
+.leader-board__car-image-cell {
   flex-basis: 6rem;
+  
+  > svg {
+    height: 48px;
+  }
+}
+
+.leader-board__name-cell {
+  flex-basis: 10rem;
+}
+
+.ASC {
+  &::after {
+    content: '↑';
+  }
+}
+
+.DESC {
+  &::after {
+    content: '↓';
+  }
 }
 
 .winner-list {

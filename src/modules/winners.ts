@@ -210,17 +210,22 @@ class Winners {
     const wins = document.createElement("div");
     wins.innerHTML = "Wins";
     wins.classList.add("leader-board__wins-cell");
+    if (this.orderBy === "wins" && this.sortOrder !== null)
+      wins.classList.add(`${this.sortOrder}`);
     wins.onclick = () => this.sortBy("wins");
     header.appendChild(wins);
     const bestTime = document.createElement("div");
     bestTime.innerHTML = "Best time (seconds)";
     bestTime.classList.add("leader-board__best-time-cell");
+    if (this.orderBy === "time" && this.sortOrder !== null)
+      bestTime.classList.add(`${this.sortOrder}`);
     bestTime.onclick = () => this.sortBy("time");
     header.appendChild(bestTime);
     return header;
   }
 
   private sortBy(sortby: "wins" | "time") {
+    this.orderBy = sortby;
     if (this.sortOrder === null) this.sortOrder = "DESC";
     else if (this.sortOrder === "ASC") this.sortOrder = "DESC";
     else this.sortOrder = "ASC";
