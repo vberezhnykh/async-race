@@ -8,9 +8,26 @@ body {
   margin-top: 10px;
 }
 
-.garage-container {
-  /*  */
+.nav-buttons {
+  display: flex;
+  gap: 10px;
 }
+
+.create-car-input,
+.update-car-input {
+  display: flex;
+  gap: 2px;
+  margin-bottom: 5px;
+}
+
+.race-button,
+.reset-button {
+  margin-right: 4px;
+}
+
+.generate-button {}
+
+.garage-container {}
 
 .garage-container--hidden {
   display: none;

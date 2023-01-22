@@ -70,6 +70,7 @@ class Garage {
 
   private createCarCreateInput() {
     const container = document.createElement("div");
+    container.classList.add("create-car-input");
     const input = document.createElement("input");
     container.append(input);
     const colorInput = document.createElement("input");
@@ -114,6 +115,7 @@ class Garage {
 
   private createUpdateInput() {
     const container = document.createElement("div");
+    container.classList.add("update-car-input");
     const input = document.createElement("input");
     container.append(input);
     const colorInput = document.createElement("input");
@@ -159,6 +161,7 @@ class Garage {
 
   private createGenerateButton() {
     const button = document.createElement("button");
+    button.classList.add("generate-button");
     button.innerHTML = "GENERATE CARS";
     button.onclick = () => {
       for (let i = 0; i < 100; i += 1) {
@@ -184,7 +187,7 @@ class Garage {
   private createRaceButtons(mode: "race" | "reset") {
     const button = document.createElement("button");
     button.innerHTML = mode.toUpperCase();
-    button.className = `${mode}`;
+    button.className = `${mode}-button`;
 
     button.onclick = () => {
       const cars: Array<Car> = [];

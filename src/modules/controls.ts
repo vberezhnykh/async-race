@@ -19,12 +19,13 @@ class Controls {
     winnersButton.textContent = "TO WINNERS";
     winnersButton.onclick = (event) => this.clearAndUpdateView(event);
     const navContainer = document.createElement("nav");
+    navContainer.classList.add("nav-buttons");
     navContainer.appendChild(garageButton);
     navContainer.appendChild(winnersButton);
     document.body.prepend(navContainer);
   }
 
-  private clearAndUpdateView(event: MouseEvent) {
+  private async clearAndUpdateView(event: MouseEvent) {
     const garageContainer = document.querySelector(".garage-container");
     const winnersContainer = document.querySelector(".winners-container");
     const button = event.target;
@@ -36,11 +37,11 @@ class Controls {
         }
         if (button.textContent === "TO WINNERS") {
           garageContainer.classList.add("garage-container--hidden");
-          this.Winners.loadWinners().then(async (promise) => {
-            const res = await promise;
-            // console.log(res);
+          const renderWinnersView = async () => {
+            await this.Winners.loadWinners();
             this.Winners.render();
-          });
+          };
+          renderWinnersView();
         }
       }
     }

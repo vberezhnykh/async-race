@@ -10,7 +10,7 @@ class Winners {
 
   orderBy: "wins" | "time" | null = null;
 
-  sortOrder: "DESC" | "ASC" = "ASC";
+  sortOrder: "DESC" | "ASC" | null = null;
 
   private paginationLimit = 10;
 
@@ -20,18 +20,13 @@ class Winners {
 
   private prevRange = 0;
 
-  private currRange = 7;
-
-  // private carsInView: Array<Car>
-
-  constructor() {
-    this.loadWinners();
-  }
+  private currRange = 10;
 
   async loadWinners() {
-    getWinners(API_URL)
+    await getWinners(API_URL)
       .then((data) => {
         this.winners = data.winners;
+        this.pageCount = Math.ceil(this.winners.length / this.paginationLimit);
       })
       .then(() => {
         const promises: Promise<Response>[] = [];
@@ -52,7 +47,7 @@ class Winners {
       });
   }
 
-  render() {
+  async render() {
     let winnersContainer = document.querySelector(".winners-container");
     if (!winnersContainer) {
       winnersContainer = document.createElement("section");
@@ -86,19 +81,60 @@ class Winners {
     nextButton.textContent = "→";
     if (this.currentPage === this.pageCount) nextButton.disabled = true;
     nav.append(nextButton);
-    /* prevButton.onclick = () => {
+    prevButton.onclick = () => {
       if (this.currentPage > 1) {
         this.currentPage -= 1;
-        this.updateCarListView(prevButton, nextButton, nav, paginationNumber);
+        this.updateWinnersListView(
+          prevButton,
+          nextButton,
+          nav,
+          paginationNumber
+        );
       }
     };
     nextButton.onclick = () => {
       if (this.currentPage < this.pageCount) {
         this.currentPage += 1;
-        this.updateCarListView(prevButton, nextButton, nav, paginationNumber);
+        this.updateWinnersListView(
+          prevButton,
+          nextButton,
+          nav,
+          paginationNumber
+        );
       }
-    }; */
+    };
     return nav;
+  }
+
+  private updateWinnersListView(
+    prevButton: HTMLButtonElement,
+    nextButton: HTMLButtonElement,
+    nav: HTMLElement,
+    paginationNumber: HTMLSpanElement
+  ) {
+    // this.carsInView = [];
+    this.handlePrevButton(prevButton);
+    this.handleNextButton(nextButton);
+    document.querySelector(".leader-board")?.remove();
+    nav.after(this.createLeaderBoard());
+    paginationNumber.textContent = `Page #${this.currentPage}`;
+  }
+
+  private updatePageRanges() {
+    this.prevRange = (this.currentPage - 1) * this.paginationLimit;
+    this.currRange = this.currentPage * this.paginationLimit;
+  }
+
+  private handlePrevButton(prevButton: HTMLButtonElement) {
+    this.updatePageRanges();
+    if (this.currentPage === 1) prevButton.disabled = true;
+    else prevButton.disabled = false;
+  }
+
+  private handleNextButton(nextButton: HTMLButtonElement) {
+    this.updatePageRanges();
+    if (this.pageCount === this.currentPage) nextButton.disabled = true;
+    else nextButton.disabled = false;
   }
 
   private createLeaderBoard() {
@@ -110,12 +146,13 @@ class Winners {
   }
 
   private createWinnersList() {
-    // console.log(this.winnersCars);
     const winnerList = document.createElement("ul");
     winnerList.classList.add("winner-list");
     for (let i = 0; i < this.winnersCars.length; i += 1) {
       const listItem = this.createListItem(i);
-      winnerList.appendChild(listItem);
+      if (i >= this.prevRange && i < this.currRange) {
+        winnerList.appendChild(listItem);
+      }
     }
     return winnerList;
   }
@@ -184,13 +221,15 @@ class Winners {
   }
 
   private sortBy(sortby: "wins" | "time") {
-    if (this.sortOrder === "ASC") this.sortOrder = "DESC";
+    if (this.sortOrder === null) this.sortOrder = "DESC";
+    else if (this.sortOrder === "ASC") this.sortOrder = "DESC";
     else this.sortOrder = "ASC";
-    this.orderBy = sortby;
     this.winners.sort((a, b) => {
       if (this.sortOrder === "DESC") return b[sortby] - a[sortby];
       return a[sortby] - b[sortby];
     });
+    /* TO-DO: добавить доп сортировку: если равны по победам, проверять дополнительно по времени
+    и наоборот */
     const winnersCarsCopy: Сharacteristics[] = [];
     this.winners.forEach((winner) => {
       const elem = this.winnersCars.find(
