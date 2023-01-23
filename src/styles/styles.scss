@@ -193,13 +193,16 @@ body {
   z-index: 3;
   font-size: 2rem;
   text-align: center;
-  border: 0.5px solid black;
   border-radius: 5px;
-  background-color: lightgray;
   position: fixed;
   width: 300px;
   top: calc(50%);
   left: calc(50% - 150px);
+  background: rgba(211, 211, 211, 0.92);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(3.9px);
+  -webkit-backdrop-filter: blur(3.9px);
+  border: 1px solid rgba(211, 211, 211, 0.3);
   
   > span {
     display: block;
@@ -207,6 +210,7 @@ body {
 
   > button {
     @include button();
+    background-color: #2d6da4;
     margin: 5px auto;
     &:hover {
       cursor: pointer;
