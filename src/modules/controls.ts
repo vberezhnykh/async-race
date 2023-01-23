@@ -13,30 +13,42 @@ class Controls {
 
   render() {
     const garageButton = document.createElement("button");
+    garageButton.classList.add("garage-button", "garage-button--active");
     garageButton.textContent = "TO GARAGE";
-    garageButton.onclick = (event) => this.clearAndUpdateView(event);
     const winnersButton = document.createElement("button");
     winnersButton.textContent = "TO WINNERS";
-    winnersButton.onclick = (event) => this.clearAndUpdateView(event);
+    winnersButton.classList.add("winners-button");
     const navContainer = document.createElement("nav");
     navContainer.classList.add("nav-buttons");
     navContainer.appendChild(garageButton);
     navContainer.appendChild(winnersButton);
+    garageButton.onclick = (event) =>
+      this.clearAndUpdateView(event, garageButton, winnersButton);
+    winnersButton.onclick = (event) =>
+      this.clearAndUpdateView(event, garageButton, winnersButton);
     document.body.prepend(navContainer);
   }
 
-  private async clearAndUpdateView(event: MouseEvent) {
+  private async clearAndUpdateView(
+    event: MouseEvent,
+    garageButton: HTMLButtonElement,
+    winnersButton: HTMLButtonElement
+  ) {
     const garageContainer = document.querySelector(".garage-container");
     const winnersContainer = document.querySelector(".winners-container");
     const button = event.target;
     if (garageContainer) {
       if (button instanceof HTMLButtonElement) {
-        if (button.textContent === "TO GARAGE") {
+        if (button === garageButton) {
           garageContainer.classList.remove("garage-container--hidden");
           if (winnersContainer) winnersContainer.remove();
+          garageButton.classList.add("garage-button--active");
+          winnersButton.classList.remove("winners-button--active");
         }
-        if (button.textContent === "TO WINNERS") {
+        if (button === winnersButton) {
           garageContainer.classList.add("garage-container--hidden");
+          garageButton.classList.remove("garage-button--active");
+          winnersButton.classList.add("winners-button--active");
           const renderWinnersView = async () => {
             await this.Winners.loadWinners();
             this.Winners.render();

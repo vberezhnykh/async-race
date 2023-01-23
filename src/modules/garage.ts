@@ -79,10 +79,12 @@ class Garage {
     const input = document.createElement("input");
     container.append(input);
     const colorInput = document.createElement("input");
+    colorInput.classList.add("color-input");
     colorInput.type = "color";
     colorInput.value = "#0000FF";
     container.append(colorInput);
     const button = document.createElement("button");
+    button.classList.add("create-button");
     button.textContent = "Create";
     button.addEventListener("click", () => {
       this.createCarAndUpdateView(input, colorInput);
@@ -124,11 +126,13 @@ class Garage {
     const input = document.createElement("input");
     container.append(input);
     const colorInput = document.createElement("input");
+    colorInput.classList.add("color-input");
     colorInput.type = "color";
     colorInput.value = "#0000FF";
     container.append(colorInput);
     const button = document.createElement("button");
     button.textContent = "Update";
+    button.classList.add("update-button");
     button.disabled = true;
     button.addEventListener("click", () =>
       this.updateCarAndView(input, colorInput)
@@ -367,6 +371,7 @@ class Garage {
     const controlButtonsContainer = document.createElement("div");
     controlButtonsContainer.classList.add("control-buttons");
     const selectButton = document.createElement("button");
+    selectButton.classList.add("select-button");
     selectButton.textContent = "SELECT";
     selectButton.addEventListener("click", () => {
       this.selectedCarId = car.id;
@@ -376,6 +381,7 @@ class Garage {
     });
     controlButtonsContainer.append(selectButton);
     const removeButton = document.createElement("button");
+    removeButton.classList.add("remove-button");
     removeButton.textContent = "REMOVE";
     removeButton.addEventListener("click", () => {
       if (car.id) this.deleteCarAndUpdateView(car.id, index);
@@ -395,11 +401,13 @@ class Garage {
     const driveButtonsContainer = document.createElement("div");
     driveButtonsContainer.classList.add("drive-buttons");
     const accelerateButton = document.createElement("button");
+    accelerateButton.classList.add("accelerate-button");
     accelerateButton.textContent = "A";
     car.accelerateButton = accelerateButton;
     driveButtonsContainer.append(accelerateButton);
     const brakeButton = document.createElement("button");
     brakeButton.textContent = "B";
+    brakeButton.classList.add("brake-button");
     car.brakeButton = brakeButton;
     brakeButton.disabled = true;
     driveButtonsContainer.append(brakeButton);
