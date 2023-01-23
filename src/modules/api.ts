@@ -150,10 +150,20 @@ export async function createWinner(url: string, params: SingleWinnerParams) {
 }
 
 export async function deleteWinner(url: string, id: number) {
-  const response = await fetch(`${url}/winners/${id}`, {
-    method: "DELETE",
-  });
-  return response.status;
+  try {
+    const response = await fetch(`${url}/winners/${id}`, {
+      method: "DELETE",
+    });
+    const result = await response.json();
+    if (response.status === 404) {
+      throw new Error();
+    }
+    return result;
+  } catch (err) {
+    // eslint-disable-next-line no-console
+    console.error("Removed car was not in the winning list.");
+    return "404";
+  }
 }
 
 export async function updateWinner(
